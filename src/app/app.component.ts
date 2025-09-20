@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
+import { LoaderService } from './core/services/loader.service';
 
 @Component({
   selector: 'app-root',
@@ -11,4 +12,9 @@ import { ToastModule } from 'primeng/toast';
 })
 export class AppComponent {
   title = 'Kata Sweet Shop';
+  loaderService = inject(LoaderService);
+
+  get globalLoader() {
+    return this.loaderService.globalLoader;
+  }
 }

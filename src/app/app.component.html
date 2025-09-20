@@ -1,2 +1,12 @@
 <router-outlet />
 <p-toast></p-toast>
+
+<!-- Global Loader -->
+@if (globalLoader().isLoading) {
+  <div class="global-loader-overlay">
+    <div class="global-loader">
+      <div class="loader-spinner"></div>
+      <p class="loader-message">{{ globalLoader().message }}</p>
+    </div>
+  </div>
+}
