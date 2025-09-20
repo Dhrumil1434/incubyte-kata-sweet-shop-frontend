@@ -10,7 +10,8 @@
     "lint": "eslint . --ext .ts,.html",
     "lint:fix": "eslint . --ext .ts,.html --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "prepare": "husky"
   },
   "private": true,
   "dependencies": {
@@ -35,12 +36,18 @@
     "zone.js": "~0.15.0"
   },
   "lint-staged": {
-    "**/*.ts": [
+    "src/**/*.{ts,tsx}": [
       "eslint --fix",
       "prettier --write"
     ],
-    "**/*.html": [
+    "src/**/*.html": [
       "eslint --fix",
+      "prettier --write"
+    ],
+    "src/**/*.{css,scss}": [
+      "prettier --write"
+    ],
+    "*.{json,md}": [
       "prettier --write"
     ]
   },
