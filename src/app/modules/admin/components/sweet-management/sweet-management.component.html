@@ -1,0 +1,136 @@
+<div class="sweet-management">
+  <!-- Header -->
+  <div class="page-header">
+    <h1 class="page-title">Sweet Management</h1>
+    <p-button
+      label="Add New Sweet"
+      icon="pi pi-plus"
+      severity="success"
+      (onClick)="openAddModal()"
+      class="add-btn"
+    >
+    </p-button>
+  </div>
+
+  <!-- Sweets Table -->
+  <div class="table-container">
+    <p-table
+      [value]="sweets"
+      [loading]="isLoading"
+      [paginator]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} sweets"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [selectionMode]="'multiple'"
+      [(selection)]="selectedSweets"
+      dataKey="id"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-sweet>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="sweet"></p-tableCheckbox>
+          </td>
+          <td>
+            <div class="sweet-name">{{ sweet.name }}</div>
+          </td>
+          <td>
+            <span class="category-badge">{{
+              getCategoryName(sweet.categoryId)
+            }}</span>
+          </td>
+          <td>
+            <span class="price">${{ sweet.price | number: '1.2-2' }}</span>
+          </td>
+          <td>
+            <span class="quantity">{{ sweet.quantity }}</span>
+          </td>
+          <td>
+            <p-tag
+              [value]="getStockStatus(sweet.quantity)"
+              [severity]="getStockSeverity(sweet.quantity)"
+            >
+            </p-tag>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <p-button
+                icon="pi pi-pencil"
+                severity="info"
+                size="small"
+                [text]="true"
+                (onClick)="openEditModal(sweet)"
+                pTooltip="Edit Sweet"
+              >
+              </p-button>
+              <p-button
+                icon="pi pi-trash"
+                severity="danger"
+                size="small"
+                [text]="true"
+                (onClick)="openDeleteModal(sweet)"
+                pTooltip="Delete Sweet"
+              >
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center">
+            <div class="empty-state">
+              <i class="pi pi-box text-4xl text-neutral-300"></i>
+              <p>No sweets found</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Sweet Form Modal -->
+  <app-sweet-form-modal
+    [visible]="showAddModal || showEditModal"
+    [isEdit]="showEditModal"
+    [sweetData]="selectedSweet"
+    [categories]="categories"
+    [loading]="isLoading"
+    (save)="onSaveSweet($event)"
+    (cancel)="closeModals()"
+  >
+  </app-sweet-form-modal>
+
+  <!-- Confirmation Modal -->
+  <app-confirmation-modal
+    [visible]="showDeleteModal"
+    title="Delete Sweet"
+    [message]="
+      'Are you sure you want to delete \'' + (selectedSweet?.name || '') + '\'?'
+    "
+    details="This action cannot be undone."
+    confirmLabel="Delete"
+    cancelLabel="Cancel"
+    confirmSeverity="danger"
+    iconClass="pi pi-trash"
+    [loading]="isLoading"
+    (confirm)="onConfirmDelete()"
+    (cancel)="closeModals()"
+  >
+  </app-confirmation-modal>
+</div>

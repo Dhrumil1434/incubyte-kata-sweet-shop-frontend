@@ -1,0 +1,248 @@
+/* Category Management Styles */
+.category-management {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Page Header */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-neutral-300);
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.add-btn {
+  padding: 0.75rem 1.5rem;
+}
+
+/* Table Container */
+.table-container {
+  background: var(--color-bg);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+/* Table Styles */
+:host ::ng-deep .p-datatable {
+  border: none;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-header {
+  background: var(--color-bg-soft);
+  border-bottom: 1px solid var(--color-neutral-300);
+  padding: 1rem;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  background: var(--color-bg-soft);
+  border-bottom: 1px solid var(--color-neutral-300);
+  color: var(--color-text);
+  font-weight: 600;
+  padding: 1rem;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-neutral-200);
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+  background: var(--color-bg-soft);
+}
+
+/* Table Content */
+.category-name {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+.date {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+}
+
+.empty-state p {
+  margin: 1rem 0 0 0;
+  color: var(--color-text-muted);
+  font-size: 1.125rem;
+}
+
+/* Dialog Styles */
+.dialog-content {
+  padding: 1rem 0;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.form-input {
+  width: 100%;
+}
+
+.form-hint {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* Delete Warning */
+.delete-warning {
+  text-align: center;
+  padding: 1rem;
+}
+
+.delete-warning h3 {
+  margin: 1rem 0 0.5rem 0;
+  color: var(--color-text);
+  font-size: 1.25rem;
+}
+
+.delete-warning p {
+  margin: 0 0 1rem 0;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.warning-note {
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.warning-note i {
+  color: var(--color-primary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .category-management {
+    padding: 1rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  :host ::ng-deep .p-datatable .p-datatable-thead > tr > th,
+  :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-management {
+    padding: 0.5rem;
+  }
+
+  .page-header {
+    padding-bottom: 0.5rem;
+  }
+
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .add-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* PrimeNG Overrides */
+:host ::ng-deep .p-dialog .p-dialog-header {
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-neutral-300);
+  padding: 1.5rem;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+  background: var(--color-bg);
+  padding: 1.5rem;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer {
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-neutral-300);
+  padding: 1.5rem;
+}
+
+:host ::ng-deep .p-inputtext {
+  width: 100%;
+}
+
+:host ::ng-deep .p-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+}
+
+/* Animation */
+.category-management {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

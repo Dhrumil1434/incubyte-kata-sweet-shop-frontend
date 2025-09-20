@@ -1,7 +1,62 @@
 <div class="admin-dashboard">
   <div class="dashboard-header">
-    <h1>Admin Dashboard</h1>
-    <p>Welcome back, {{ currentUser?.userName || 'Admin' }}!</p>
+    <div class="header-content">
+      <h1>Admin Dashboard</h1>
+      <p>Welcome back, {{ currentUser?.userName || 'Admin' }}!</p>
+    </div>
+    <div class="header-actions">
+      <div class="action-buttons">
+        <p-button
+          label="Manage Sweets"
+          icon="pi pi-box"
+          severity="success"
+          [routerLink]="['/admin/sweets']"
+          class="nav-btn"
+        >
+        </p-button>
+        <p-button
+          label="Manage Categories"
+          icon="pi pi-tags"
+          severity="info"
+          [routerLink]="['/admin/categories']"
+          class="nav-btn"
+        >
+        </p-button>
+        <p-button
+          label="Manage Users"
+          icon="pi pi-users"
+          severity="help"
+          [routerLink]="['/admin/users']"
+          class="nav-btn"
+        >
+        </p-button>
+        <p-button
+          label="View Purchases"
+          icon="pi pi-shopping-cart"
+          severity="help"
+          [routerLink]="['/admin/purchases']"
+          class="nav-btn"
+        >
+        </p-button>
+        <p-button
+          label="Test Backend"
+          icon="pi pi-cog"
+          severity="secondary"
+          [routerLink]="['/admin/backend-test']"
+          class="nav-btn"
+        >
+        </p-button>
+      </div>
+      <p-button
+        label="Logout"
+        icon="pi pi-sign-out"
+        severity="secondary"
+        [text]="true"
+        (onClick)="onLogout()"
+        class="logout-btn"
+      >
+      </p-button>
+    </div>
   </div>
 
   <!-- Stats Cards -->

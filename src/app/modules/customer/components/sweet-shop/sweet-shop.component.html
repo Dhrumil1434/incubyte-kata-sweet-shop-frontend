@@ -1,0 +1,250 @@
+<div class="sweet-shop">
+  <!-- Header -->
+  <div class="page-header">
+    <h1 class="page-title">Sweet Shop</h1>
+    <p class="page-subtitle">Discover our delicious collection of sweets</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="searchInput">Search:</label>
+        <input
+          id="searchInput"
+          type="text"
+          pInputText
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange()"
+          placeholder="Search sweets..."
+          class="filter-input"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="categoryFilter">Category:</label>
+        <p-select
+          id="categoryFilter"
+          [(ngModel)]="filters.category"
+          [options]="categories"
+          optionLabel="name"
+          optionValue="name"
+          (onChange)="onCategoryChange()"
+          placeholder="All Categories"
+          class="filter-select"
+        >
+        </p-select>
+      </div>
+
+      <div class="filter-group">
+        <label for="sortBy">Sort By:</label>
+        <p-select
+          id="sortBy"
+          [(ngModel)]="filters.sortBy"
+          [options]="[
+            { label: 'Name', value: 'name' },
+            { label: 'Price', value: 'price' },
+            { label: 'Quantity', value: 'quantity' },
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onSortChange()"
+          class="filter-select"
+        >
+        </p-select>
+      </div>
+
+      <div class="filter-group">
+        <label for="sortOrder">Order:</label>
+        <p-select
+          id="sortOrder"
+          [(ngModel)]="filters.sortOrder"
+          [options]="[
+            { label: 'Ascending', value: 'asc' },
+            { label: 'Descending', value: 'desc' },
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onSortChange()"
+          class="filter-select"
+        >
+        </p-select>
+      </div>
+
+      <div class="filter-group">
+        <label for="minPrice">Min Price:</label>
+        <p-inputNumber
+          id="minPrice"
+          [(ngModel)]="filters.minPrice"
+          (onInput)="onPriceRangeChange()"
+          mode="currency"
+          currency="USD"
+          [min]="0"
+          [max]="999.99"
+          placeholder="0.00"
+          class="filter-input"
+        >
+        </p-inputNumber>
+      </div>
+
+      <div class="filter-group">
+        <label for="maxPrice">Max Price:</label>
+        <p-inputNumber
+          id="maxPrice"
+          [(ngModel)]="filters.maxPrice"
+          (onInput)="onPriceRangeChange()"
+          mode="currency"
+          currency="USD"
+          [min]="0"
+          [max]="999.99"
+          placeholder="999.99"
+          class="filter-input"
+        >
+        </p-inputNumber>
+      </div>
+
+      <div class="filter-group">
+        <label for="inStockFilter">Stock:</label>
+        <p-select
+          id="inStockFilter"
+          [(ngModel)]="filters.inStock"
+          [options]="[
+            { label: 'All', value: null },
+            { label: 'In Stock Only', value: true },
+            { label: 'Out of Stock', value: false },
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onStockFilterChange()"
+          class="filter-select"
+        >
+        </p-select>
+      </div>
+
+      <div class="filter-actions">
+        <p-button
+          label="Clear Filters"
+          icon="pi pi-times"
+          severity="secondary"
+          [text]="true"
+          (onClick)="clearFilters()"
+        >
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-container">
+      <i class="pi pi-spin pi-spinner text-4xl text-primary"></i>
+      <p class="loading-text">Loading sweets...</p>
+    </div>
+  }
+
+  <!-- Sweets Grid -->
+  @if (!isLoading) {
+    <div class="sweets-grid">
+      @for (sweet of sweets; track trackBySweetId($index, sweet)) {
+        <div class="sweet-card">
+          <p-card>
+            <ng-template pTemplate="header">
+              <div class="sweet-image">
+                <i class="pi pi-image text-6xl text-neutral-300"></i>
+              </div>
+            </ng-template>
+
+            <div class="sweet-content">
+              <h3 class="sweet-name">{{ sweet.name }}</h3>
+              <p class="sweet-category">
+                {{ getCategoryName(sweet.categoryId) }}
+              </p>
+              <p class="sweet-price">{{ formatPrice(sweet.price) }}</p>
+
+              <div class="sweet-stock">
+                <p-tag
+                  [value]="getStockStatus(sweet.quantity)"
+                  [severity]="getStockSeverity(sweet.quantity)"
+                >
+                </p-tag>
+                <span class="stock-quantity"
+                  >{{ sweet.quantity }} available</span
+                >
+              </div>
+
+              @if (sweet.quantity > 0) {
+                <div class="purchase-section">
+                  <div class="quantity-selector">
+                    <label for="quantity-{{ sweet.id }}">Quantity:</label>
+                    <p-inputNumber
+                      [id]="'quantity-' + sweet.id"
+                      [(ngModel)]="purchaseQuantities[sweet.id]"
+                      (onInput)="updateQuantity(sweet.id, $event.value || 1)"
+                      [min]="1"
+                      [max]="sweet.quantity"
+                      class="quantity-input"
+                    >
+                    </p-inputNumber>
+                  </div>
+
+                  <p-button
+                    label="Add to Cart"
+                    icon="pi pi-shopping-cart"
+                    severity="success"
+                    (onClick)="onPurchase(sweet)"
+                    [disabled]="sweet.quantity === 0"
+                    class="purchase-btn"
+                  >
+                  </p-button>
+                </div>
+              } @else {
+                <div class="out-of-stock">
+                  <p-button
+                    label="Out of Stock"
+                    icon="pi pi-times"
+                    severity="secondary"
+                    [disabled]="true"
+                    class="out-of-stock-btn"
+                  >
+                  </p-button>
+                </div>
+              }
+            </div>
+          </p-card>
+        </div>
+      }
+    </div>
+
+    <!-- Empty State -->
+    @if (sweets.length === 0) {
+      <div class="empty-state">
+        <i class="pi pi-box text-6xl text-neutral-300"></i>
+        <h3>No sweets found</h3>
+        <p>Try adjusting your search criteria or filters.</p>
+        <p-button
+          label="Clear Filters"
+          icon="pi pi-times"
+          severity="secondary"
+          (onClick)="clearFilters()"
+        >
+        </p-button>
+      </div>
+    }
+
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+      <div class="pagination-container">
+        <p-paginator
+          [rows]="rowsPerPage"
+          [totalRecords]="totalRecords"
+          [first]="(currentPage - 1) * rowsPerPage"
+          (onPageChange)="onPageChange($event)"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} sweets"
+          [rowsPerPageOptions]="[12, 24, 48]"
+        >
+        </p-paginator>
+      </div>
+    }
+  }
+</div>

@@ -1,192 +1,220 @@
-<!-- Customer Dashboard - Sweet Shop Experience -->
 <div class="customer-dashboard">
-  <!-- Header Section -->
-  <div class="dashboard-header">
-    <div class="header-content">
-      <div class="header-left">
-        <h1 class="dashboard-title">Welcome to Kata Sweet Shop</h1>
-        <p class="dashboard-subtitle">Discover delicious sweets and treats</p>
+  <!-- Backend Test Section (Temporary) -->
+  <section class="backend-test-section">
+    <app-backend-test></app-backend-test>
+  </section>
+
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-left">
+      <h1 class="dashboard-title">
+        <i class="pi pi-heart text-primary"></i>
+        Kata Sweet Shop
+      </h1>
+    </div>
+
+    <div class="header-right">
+      <div class="nav-buttons">
+        <p-button
+          label="Shop"
+          icon="pi pi-box"
+          severity="primary"
+          [text]="true"
+          [routerLink]="['/customer/shop']"
+          class="nav-btn"
+        >
+        </p-button>
+        <p-button
+          label="My Purchases"
+          icon="pi pi-shopping-bag"
+          severity="secondary"
+          [text]="true"
+          [routerLink]="['/customer/purchases']"
+          class="nav-btn"
+        >
+        </p-button>
+        <p-button
+          label="Profile"
+          icon="pi pi-user"
+          severity="help"
+          [text]="true"
+          [routerLink]="['/customer/profile']"
+          class="nav-btn"
+        >
+        </p-button>
       </div>
-      <div class="header-right">
-        <div class="user-info">
-          <span class="welcome-text"
-            >Hello, {{ currentUser?.firstName || currentUser?.userName }}</span
-          >
+      <div class="user-info">
+        <i class="pi pi-user text-lg"></i>
+        <span class="user-name">{{ currentUser?.userName || 'Customer' }}</span>
+      </div>
+      <p-button
+        label="Logout"
+        icon="pi pi-sign-out"
+        severity="secondary"
+        [text]="true"
+        (onClick)="onLogout()"
+        class="logout-btn"
+      >
+      </p-button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Search Section -->
+    <section class="search-section">
+      <div class="search-container">
+        <div class="search-input-container">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            pInputText
+            placeholder="Search for sweets..."
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInputChange()"
+            class="search-input"
+          />
           <p-button
-            label="Logout"
-            icon="pi pi-sign-out"
+            *ngIf="searchQuery"
+            icon="pi pi-times"
             severity="secondary"
+            [text]="true"
             size="small"
-            (onClick)="onLogout()"
+            (onClick)="clearSearch()"
+            class="clear-search-btn"
           >
           </p-button>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- Stats Cards -->
-  <div class="stats-grid">
-    <p-card class="stat-card">
-      <div class="stat-content">
-        <div class="stat-icon orders">
-          <i class="pi pi-shopping-bag"></i>
-        </div>
-        <div class="stat-details">
-          <h3 class="stat-number">{{ stats.totalOrders }}</h3>
-          <p class="stat-label">Total Orders</p>
-        </div>
-      </div>
-    </p-card>
-
-    <p-card class="stat-card">
-      <div class="stat-content">
-        <div class="stat-icon spent">
-          <i class="pi pi-dollar"></i>
-        </div>
-        <div class="stat-details">
-          <h3 class="stat-number">${{ stats.totalSpent | number: '1.2-2' }}</h3>
-          <p class="stat-label">Total Spent</p>
-        </div>
-      </div>
-    </p-card>
-
-    <p-card class="stat-card">
-      <div class="stat-content">
-        <div class="stat-icon favorites">
-          <i class="pi pi-heart"></i>
-        </div>
-        <div class="stat-details">
-          <h3 class="stat-number">{{ stats.favoriteSweets }}</h3>
-          <p class="stat-label">Favorite Sweets</p>
-        </div>
-      </div>
-    </p-card>
-
-    <p-card class="stat-card">
-      <div class="stat-content">
-        <div class="stat-icon pending">
-          <i class="pi pi-clock"></i>
-        </div>
-        <div class="stat-details">
-          <h3 class="stat-number">{{ stats.pendingOrders }}</h3>
-          <p class="stat-label">Pending Orders</p>
-        </div>
-      </div>
-    </p-card>
-  </div>
-
-  <!-- Main Content Grid -->
-  <div class="content-grid">
-    <!-- Recommended Sweets -->
-    <div class="recommended-section">
-      <p-card header="Recommended for You">
-        <div class="sweets-grid">
-          <div
-            class="sweet-card"
-            *ngFor="let sweet of recommendedSweets; trackBy: trackBySweetId"
+    <!-- Categories Section -->
+    <section class="categories-section" *ngIf="categories.length > 0">
+      <div class="categories-container">
+        <h3 class="categories-title">Categories</h3>
+        <div class="categories-list">
+          <button
+            *ngFor="let category of categories; trackBy: trackByCategoryId"
+            class="category-btn"
+            [class.active]="selectedCategory?.id === category.id"
+            (click)="filterByCategory(category)"
           >
-            <div class="sweet-image">
-              <div class="image-placeholder">
-                <i class="pi pi-image"></i>
-              </div>
-              <div class="sweet-rating">
-                <i class="pi pi-star-fill"></i>
-                <span>{{ sweet.rating }}</span>
-              </div>
+            {{ category.name }}
+          </button>
+          <button
+            class="category-btn"
+            [class.active]="!selectedCategory"
+            (click)="clearCategoryFilter()"
+          >
+            All
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section">
+      <div class="products-header">
+        <h2 class="products-title">
+          {{
+            selectedCategory ? selectedCategory.name + ' Sweets' : 'All Sweets'
+          }}
+        </h2>
+        <span class="products-count">{{ totalItems }} products</span>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-container">
+        <p-progressSpinner
+          [style]="{ width: '40px', height: '40px' }"
+          strokeWidth="4"
+          fill="var(--color-bg-soft)"
+          animationDuration="1s"
+        >
+        </p-progressSpinner>
+        <p class="loading-text">Loading sweets...</p>
+      </div>
+
+      <!-- Products Grid -->
+      <div *ngIf="!isLoading && sweets.length > 0" class="products-grid">
+        <div
+          *ngFor="let sweet of sweets; trackBy: trackBySweetId"
+          class="sweet-card"
+        >
+          <div class="sweet-image">
+            <i class="pi pi-image text-4xl text-neutral-300"></i>
+            <div class="sweet-badge" *ngIf="sweet.quantity === 0">
+              <span class="badge-text">Out of Stock</span>
             </div>
-            <div class="sweet-info">
-              <h4 class="sweet-name">{{ sweet.name }}</h4>
-              <p class="sweet-price">${{ sweet.price | number: '1.2-2' }}</p>
+          </div>
+
+          <div class="sweet-content">
+            <h3 class="sweet-name">{{ sweet.name }}</h3>
+            <p class="sweet-category" *ngIf="sweet.category">
+              {{ sweet.category.name }}
+            </p>
+            <div class="sweet-price">${{ sweet.price | number: '1.2-2' }}</div>
+            <div class="sweet-stock" *ngIf="sweet.quantity > 0">
+              <i class="pi pi-box text-sm"></i>
+              <span>{{ sweet.quantity }} in stock</span>
+            </div>
+
+            <div class="sweet-actions">
               <p-button
-                label="Add to Cart"
+                *ngIf="sweet.quantity > 0"
+                label="Purchase"
                 icon="pi pi-shopping-cart"
-                size="small"
                 severity="success"
-                (onClick)="onAddToCart(sweet)"
+                size="small"
+                [disabled]="sweet.quantity === 0"
+                (onClick)="onPurchase(sweet)"
+                class="purchase-btn"
+              >
+              </p-button>
+
+              <p-button
+                *ngIf="sweet.quantity === 0"
+                label="Out of Stock"
+                severity="secondary"
+                size="small"
+                [disabled]="true"
+                class="out-of-stock-btn"
               >
               </p-button>
             </div>
           </div>
         </div>
-        <div class="card-footer">
-          <p-button
-            label="Browse All Sweets"
-            icon="pi pi-shopping-cart"
-            size="small"
-            routerLink="/customer/shop"
-          >
-          </p-button>
-        </div>
-      </p-card>
-    </div>
+      </div>
 
-    <!-- Recent Orders -->
-    <div class="recent-section">
-      <p-card header="Recent Orders">
-        <div class="orders-list">
-          <div
-            class="order-item"
-            *ngFor="let order of recentOrders; trackBy: trackByOrderId"
-          >
-            <div class="order-info">
-              <h4 class="order-id">Order #{{ order.id }}</h4>
-              <p class="order-items">{{ order.items }}</p>
-              <p class="order-date">{{ order.date }}</p>
-            </div>
-            <div class="order-details">
-              <p class="order-total">${{ order.total | number: '1.2-2' }}</p>
-              <p-tag
-                [value]="order.status"
-                [severity]="getStatusSeverity(order.status)"
-              >
-              </p-tag>
-            </div>
-          </div>
-        </div>
-        <div class="card-footer">
-          <p-button
-            label="View All Orders"
-            icon="pi pi-shopping-bag"
-            size="small"
-            routerLink="/customer/orders"
-          >
-          </p-button>
-        </div>
-      </p-card>
-    </div>
-  </div>
-
-  <!-- Quick Actions -->
-  <div class="quick-actions">
-    <p-card header="Quick Actions">
-      <div class="actions-grid">
+      <!-- No Results -->
+      <div *ngIf="!isLoading && sweets.length === 0" class="no-results">
+        <i class="pi pi-search text-6xl text-neutral-300"></i>
+        <h3 class="no-results-title">No sweets found</h3>
+        <p class="no-results-message">
+          Try adjusting your search or filter criteria.
+        </p>
         <p-button
-          label="Browse Sweets"
-          icon="pi pi-shopping-cart"
-          severity="success"
-          routerLink="/customer/shop"
+          label="Clear Filters"
+          severity="secondary"
+          (onClick)="clearAllFilters()"
+          class="clear-filters-btn"
         >
-        </p-button>
-        <p-button
-          label="My Orders"
-          icon="pi pi-shopping-bag"
-          severity="info"
-          routerLink="/customer/orders"
-        >
-        </p-button>
-        <p-button
-          label="My Profile"
-          icon="pi pi-user"
-          severity="help"
-          routerLink="/customer/profile"
-        >
-        </p-button>
-        <p-button label="Contact Support" icon="pi pi-phone" severity="help">
         </p-button>
       </div>
-    </p-card>
-  </div>
-</div>
 
-<p-toast></p-toast>
+      <!-- Pagination -->
+      <div *ngIf="!isLoading && sweets.length > 0" class="pagination-container">
+        <p-paginator
+          [rows]="itemsPerPage"
+          [totalRecords]="totalItems"
+          [first]="(currentPage - 1) * itemsPerPage"
+          (onPageChange)="onPageChange($event)"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+          [rowsPerPageOptions]="[12, 24, 48]"
+        >
+        </p-paginator>
+      </div>
+    </section>
+  </main>
+</div>

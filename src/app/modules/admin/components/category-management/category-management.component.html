@@ -1,0 +1,142 @@
+<div class="category-management">
+  <!-- Header -->
+  <div class="page-header">
+    <h1 class="page-title">Category Management</h1>
+    <p-button
+      label="Add New Category"
+      icon="pi pi-plus"
+      severity="success"
+      (onClick)="openAddModal()"
+      class="add-btn"
+    >
+    </p-button>
+  </div>
+
+  <!-- Categories Table -->
+  <div class="table-container">
+    <p-table
+      [value]="categories"
+      [loading]="isLoading"
+      [paginator]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} categories"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [selectionMode]="'multiple'"
+      [(selection)]="selectedCategories"
+      dataKey="id"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Updated</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-category>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="category"></p-tableCheckbox>
+          </td>
+          <td>
+            <div class="category-name">{{ category.name }}</div>
+          </td>
+          <td>
+            <p-tag
+              [value]="getStatusLabel(category.isActive)"
+              [severity]="getStatusSeverity(category.isActive)"
+            >
+            </p-tag>
+          </td>
+          <td>
+            <span class="date">{{ category.createdAt | date: 'short' }}</span>
+          </td>
+          <td>
+            <span class="date">{{ category.updatedAt | date: 'short' }}</span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <p-button
+                icon="pi pi-pencil"
+                severity="info"
+                size="small"
+                [text]="true"
+                (onClick)="openEditModal(category)"
+                pTooltip="Edit Category"
+              >
+              </p-button>
+              <p-button
+                *ngIf="category.isActive"
+                icon="pi pi-trash"
+                severity="danger"
+                size="small"
+                [text]="true"
+                (onClick)="openDeleteModal(category)"
+                pTooltip="Delete Category"
+              >
+              </p-button>
+              <p-button
+                *ngIf="!category.isActive"
+                icon="pi pi-refresh"
+                severity="success"
+                size="small"
+                [text]="true"
+                (onClick)="onReactivateCategory(category)"
+                pTooltip="Reactivate Category"
+              >
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center">
+            <div class="empty-state">
+              <i class="pi pi-tags text-4xl text-neutral-300"></i>
+              <p>No categories found</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Category Form Modal -->
+  <app-category-form-modal
+    [visible]="showAddModal || showEditModal"
+    [isEdit]="showEditModal"
+    [categoryData]="selectedCategory"
+    [loading]="isLoading"
+    (save)="onSaveCategory($event)"
+    (cancel)="closeModals()"
+  >
+  </app-category-form-modal>
+
+  <!-- Confirmation Modal -->
+  <app-confirmation-modal
+    [visible]="showDeleteModal"
+    title="Delete Category"
+    [message]="
+      'Are you sure you want to delete \'' +
+      (selectedCategory?.name || '') +
+      '\'?'
+    "
+    details="This will deactivate the category. You can reactivate it later if needed."
+    confirmLabel="Delete"
+    cancelLabel="Cancel"
+    confirmSeverity="danger"
+    iconClass="pi pi-trash"
+    [loading]="isLoading"
+    (confirm)="onConfirmDelete()"
+    (cancel)="closeModals()"
+  >
+  </app-confirmation-modal>
+</div>

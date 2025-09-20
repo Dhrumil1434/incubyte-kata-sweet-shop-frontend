@@ -11,8 +11,20 @@ export const API_ENDPOINTS = {
 
   // Sweet shop specific endpoints
   SWEETS: '/sweets',
-  CATEGORIES: '/categories',
+  SWEETS_SEARCH: '/sweets/search',
+  SWEET_PURCHASE: (id: number) => `/sweets/${id}/purchase`,
+  SWEET_RESTOCK: (id: number) => `/sweets/${id}/restock`,
+  SWEET_REACTIVATE: (id: number) => `/sweets/${id}/reactivate`,
+
+  // Category endpoints
+  CATEGORIES: '/sweet/category',
+  CATEGORIES_ACTIVE: '/sweet/category/active/list',
+  CATEGORY_REACTIVATE: (id: number) => `/sweet/category/${id}/reactivate`,
+
+  // Purchase endpoints
   PURCHASES: '/purchases',
+  PURCHASES_BY_USER: (userId: number) => `/purchases/user/${userId}`,
+  PURCHASES_BY_SWEET: (sweetId: number) => `/purchases/sweet/${sweetId}`,
 } as const;
 
 export const HTTP_STATUS_CODES = {

@@ -1,0 +1,248 @@
+<div class="user-management">
+  <!-- Header -->
+  <div class="page-header">
+    <h1 class="page-title">User Management</h1>
+    <div class="header-actions">
+      <p-button
+        label="Refresh"
+        icon="pi pi-refresh"
+        severity="secondary"
+        [text]="true"
+        (onClick)="loadUsers()"
+        [loading]="isLoading"
+      >
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="searchName">Search by Name:</label>
+        <input
+          id="searchName"
+          type="text"
+          pInputText
+          [(ngModel)]="filters.name"
+          (input)="onSearchChange()"
+          placeholder="Enter user name"
+          class="filter-input"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="searchEmail">Search by Email:</label>
+        <input
+          id="searchEmail"
+          type="text"
+          pInputText
+          [(ngModel)]="filters.email"
+          (input)="onSearchChange()"
+          placeholder="Enter email"
+          class="filter-input"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="roleFilter">Filter by Role:</label>
+        <p-select
+          id="roleFilter"
+          [(ngModel)]="filters.role"
+          [options]="roleOptions"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onRoleChange()"
+          placeholder="Select role"
+          class="filter-select"
+        >
+        </p-select>
+      </div>
+
+      <div class="filter-group">
+        <label for="sortBy">Sort By:</label>
+        <p-select
+          id="sortBy"
+          [(ngModel)]="filters.sortBy"
+          [options]="[
+            { label: 'ID', value: 'id' },
+            { label: 'Name', value: 'name' },
+            { label: 'Email', value: 'email' },
+            { label: 'Role', value: 'role' },
+            { label: 'Created Date', value: 'createdAt' },
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onSortChange()"
+          class="filter-select"
+        >
+        </p-select>
+      </div>
+
+      <div class="filter-group">
+        <label for="sortOrder">Sort Order:</label>
+        <p-select
+          id="sortOrder"
+          [(ngModel)]="filters.sortOrder"
+          [options]="[
+            { label: 'Ascending', value: 'asc' },
+            { label: 'Descending', value: 'desc' },
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onSortChange()"
+          class="filter-select"
+        >
+        </p-select>
+      </div>
+
+      <div class="filter-actions">
+        <p-button
+          label="Clear Filters"
+          icon="pi pi-times"
+          severity="secondary"
+          [text]="true"
+          (onClick)="clearFilters()"
+        >
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="table-container">
+    <p-table
+      [value]="users"
+      [loading]="isLoading"
+      [paginator]="true"
+      [rows]="rowsPerPage"
+      [totalRecords]="totalRecords"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [selectionMode]="'multiple'"
+      [(selection)]="selectedUsers"
+      dataKey="id"
+      (onPage)="onPageChange($event)"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="user"></p-tableCheckbox>
+          </td>
+          <td>{{ user.id }}</td>
+          <td>
+            <div class="user-name">{{ user.name }}</div>
+          </td>
+          <td>
+            <div class="user-email">{{ user.email }}</div>
+          </td>
+          <td>
+            <p-tag [value]="user.role" [severity]="getRoleSeverity(user.role)">
+            </p-tag>
+          </td>
+          <td>
+            <p-tag
+              [value]="getStatusLabel(user.isActive)"
+              [severity]="getStatusSeverity(user.isActive)"
+            >
+            </p-tag>
+          </td>
+          <td>
+            <span class="created-date">{{
+              user.createdAt | date: 'short'
+            }}</span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              @if (!user.isActive) {
+                <p-button
+                  icon="pi pi-refresh"
+                  severity="success"
+                  size="small"
+                  [text]="true"
+                  (onClick)="openReactivateModal(user)"
+                  pTooltip="Reactivate User"
+                >
+                </p-button>
+              }
+              <p-button
+                icon="pi pi-trash"
+                severity="danger"
+                size="small"
+                [text]="true"
+                (onClick)="openDeleteModal(user)"
+                pTooltip="Delete User"
+              >
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="text-center">
+            <div class="empty-state">
+              <i class="pi pi-users text-4xl text-neutral-300"></i>
+              <p>No users found</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <app-confirmation-modal
+    [visible]="showDeleteModal"
+    title="Delete User"
+    [message]="
+      'Are you sure you want to delete \'' + (selectedUser?.name || '') + '\'?'
+    "
+    details="This action cannot be undone. The user will be deactivated."
+    confirmLabel="Delete"
+    cancelLabel="Cancel"
+    confirmSeverity="danger"
+    iconClass="pi pi-trash"
+    [loading]="isLoading"
+    (confirm)="onConfirmDelete()"
+    (cancel)="closeModals()"
+  >
+  </app-confirmation-modal>
+
+  <!-- Reactivate Confirmation Modal -->
+  <app-confirmation-modal
+    [visible]="showReactivateModal"
+    title="Reactivate User"
+    [message]="
+      'Are you sure you want to reactivate \'' +
+      (selectedUser?.name || '') +
+      '\'?'
+    "
+    details="The user will be able to access the system again."
+    confirmLabel="Reactivate"
+    cancelLabel="Cancel"
+    confirmSeverity="success"
+    iconClass="pi pi-refresh"
+    [loading]="isLoading"
+    (confirm)="onConfirmReactivate()"
+    (cancel)="closeModals()"
+  >
+  </app-confirmation-modal>
+</div>

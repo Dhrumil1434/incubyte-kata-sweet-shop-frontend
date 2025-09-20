@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ValidationError } from '../models/validation.model';
-import { ApiError } from '../models/api-response.model';
+// import { ApiError } from '../models/api-response.model';
+import { MessageService } from 'primeng/api';
 
 export interface FormFieldErrors {
   [key: string]: string;
@@ -10,6 +11,7 @@ export interface FormFieldErrors {
   providedIn: 'root',
 })
 export class ErrorHandlerService {
+  constructor(private messageService: MessageService) {}
   /**
    * Handle validation errors
    */
@@ -39,18 +41,42 @@ export class ErrorHandlerService {
   }
 
   /**
-   * Handle API errors
+   * Handle API errors with user-friendly messages
    */
-  showApiError(error: ApiError): void {
+  showApiError(error: any): void {
     console.error('API Error:', error);
 
-    // Show the main error message
-    // this.toastService.showError(error.message);
+    let message = 'An unexpected error occurred. Please try again.';
+    let summary = 'Error';
+
+    // Extract message from different error structures
+    if (error?.error?.message) {
+      message = error.error.message;
+    } else if (error?.error?.data?.message) {
+      message = error.error.data.message;
+    } else if (error?.message) {
+      message = error.message;
+    } else if (error?.error?.errors && Array.isArray(error.error.errors)) {
+      // Handle validation errors array
+      const validationErrors = error.error.errors
+        .map((err: any) => err.message)
+        .join(', ');
+      message = validationErrors;
+      summary = 'Validation Error';
+    }
+
+    // Show the error message to user
+    this.messageService.add({
+      severity: 'error',
+      summary: summary,
+      detail: message,
+      life: 5000,
+    });
 
     // Log detailed errors if available
-    if (error.errors && error.errors.length > 0) {
-      error.errors.forEach(err => {
-        console.warn(`Field ${err.field}: ${err.message}`);
+    if (error?.error?.errors && Array.isArray(error.error.errors)) {
+      error.error.errors.forEach((err: any) => {
+        console.warn(`Field ${err.field || 'unknown'}: ${err.message}`);
       });
     }
   }
