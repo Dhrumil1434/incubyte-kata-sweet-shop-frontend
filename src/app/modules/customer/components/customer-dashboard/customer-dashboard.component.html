@@ -1,0 +1,192 @@
+<!-- Customer Dashboard - Sweet Shop Experience -->
+<div class="customer-dashboard">
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="dashboard-title">Welcome to Kata Sweet Shop</h1>
+        <p class="dashboard-subtitle">Discover delicious sweets and treats</p>
+      </div>
+      <div class="header-right">
+        <div class="user-info">
+          <span class="welcome-text"
+            >Hello, {{ currentUser?.firstName || currentUser?.userName }}</span
+          >
+          <p-button
+            label="Logout"
+            icon="pi pi-sign-out"
+            severity="secondary"
+            size="small"
+            (onClick)="onLogout()"
+          >
+          </p-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <p-card class="stat-card">
+      <div class="stat-content">
+        <div class="stat-icon orders">
+          <i class="pi pi-shopping-bag"></i>
+        </div>
+        <div class="stat-details">
+          <h3 class="stat-number">{{ stats.totalOrders }}</h3>
+          <p class="stat-label">Total Orders</p>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card class="stat-card">
+      <div class="stat-content">
+        <div class="stat-icon spent">
+          <i class="pi pi-dollar"></i>
+        </div>
+        <div class="stat-details">
+          <h3 class="stat-number">${{ stats.totalSpent | number: '1.2-2' }}</h3>
+          <p class="stat-label">Total Spent</p>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card class="stat-card">
+      <div class="stat-content">
+        <div class="stat-icon favorites">
+          <i class="pi pi-heart"></i>
+        </div>
+        <div class="stat-details">
+          <h3 class="stat-number">{{ stats.favoriteSweets }}</h3>
+          <p class="stat-label">Favorite Sweets</p>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card class="stat-card">
+      <div class="stat-content">
+        <div class="stat-icon pending">
+          <i class="pi pi-clock"></i>
+        </div>
+        <div class="stat-details">
+          <h3 class="stat-number">{{ stats.pendingOrders }}</h3>
+          <p class="stat-label">Pending Orders</p>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Recommended Sweets -->
+    <div class="recommended-section">
+      <p-card header="Recommended for You">
+        <div class="sweets-grid">
+          <div
+            class="sweet-card"
+            *ngFor="let sweet of recommendedSweets; trackBy: trackBySweetId"
+          >
+            <div class="sweet-image">
+              <div class="image-placeholder">
+                <i class="pi pi-image"></i>
+              </div>
+              <div class="sweet-rating">
+                <i class="pi pi-star-fill"></i>
+                <span>{{ sweet.rating }}</span>
+              </div>
+            </div>
+            <div class="sweet-info">
+              <h4 class="sweet-name">{{ sweet.name }}</h4>
+              <p class="sweet-price">${{ sweet.price | number: '1.2-2' }}</p>
+              <p-button
+                label="Add to Cart"
+                icon="pi pi-shopping-cart"
+                size="small"
+                severity="success"
+                (onClick)="onAddToCart(sweet)"
+              >
+              </p-button>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <p-button
+            label="Browse All Sweets"
+            icon="pi pi-shopping-cart"
+            size="small"
+            routerLink="/customer/shop"
+          >
+          </p-button>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="recent-section">
+      <p-card header="Recent Orders">
+        <div class="orders-list">
+          <div
+            class="order-item"
+            *ngFor="let order of recentOrders; trackBy: trackByOrderId"
+          >
+            <div class="order-info">
+              <h4 class="order-id">Order #{{ order.id }}</h4>
+              <p class="order-items">{{ order.items }}</p>
+              <p class="order-date">{{ order.date }}</p>
+            </div>
+            <div class="order-details">
+              <p class="order-total">${{ order.total | number: '1.2-2' }}</p>
+              <p-tag
+                [value]="order.status"
+                [severity]="getStatusSeverity(order.status)"
+              >
+              </p-tag>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <p-button
+            label="View All Orders"
+            icon="pi pi-shopping-bag"
+            size="small"
+            routerLink="/customer/orders"
+          >
+          </p-button>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <p-card header="Quick Actions">
+      <div class="actions-grid">
+        <p-button
+          label="Browse Sweets"
+          icon="pi pi-shopping-cart"
+          severity="success"
+          routerLink="/customer/shop"
+        >
+        </p-button>
+        <p-button
+          label="My Orders"
+          icon="pi pi-shopping-bag"
+          severity="info"
+          routerLink="/customer/orders"
+        >
+        </p-button>
+        <p-button
+          label="My Profile"
+          icon="pi pi-user"
+          severity="help"
+          routerLink="/customer/profile"
+        >
+        </p-button>
+        <p-button label="Contact Support" icon="pi pi-phone" severity="warning">
+        </p-button>
+      </div>
+    </p-card>
+  </div>
+</div>
+
+<p-toast></p-toast>
