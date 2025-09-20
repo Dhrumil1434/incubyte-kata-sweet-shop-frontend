@@ -6,7 +6,9 @@ import {
   loginApiResponseSchema,
   LoginResponse,
   UserLoginDto,
+  UserRegisterDto,
   userLoginSchemaDto,
+  userRegisterSchemaDto,
 } from '../../../../assets/schemas/auth.schema';
 import { API_ENDPOINTS } from '../../../core/constants/api.constants';
 import {
@@ -167,6 +169,42 @@ export class AuthService {
 
     // Clear any existing auth data on error
     this.coreAuthService.clearAuthData();
+
+    // You can add additional error handling here
+    // e.g., show toast messages, track analytics, etc.
+  }
+
+  /**
+   * Register a new user
+   */
+  registerUser(registerData: UserRegisterDto): Observable<any> {
+    // Validate the registration data
+    const validationResult = this.validationService.validate(
+      registerData,
+      userRegisterSchemaDto
+    );
+
+    if (!validationResult.success) {
+      return throwError(() => new Error('Validation failed'));
+    }
+
+    return this.baseApiService.post(
+      API_ENDPOINTS.REGISTER,
+      registerData
+    ).pipe(
+      tap((response) => {
+        console.log('Registration successful:', response);
+        // Registration successful - user can now login
+      }),
+      catchError((error) => {
+        this.handleRegistrationError(error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  private handleRegistrationError(error: any): void {
+    console.error('Registration failed:', error);
 
     // You can add additional error handling here
     // e.g., show toast messages, track analytics, etc.

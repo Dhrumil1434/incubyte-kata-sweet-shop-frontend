@@ -5,18 +5,11 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
+  AbstractControl,
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
-import { DropdownModule } from 'primeng/dropdown';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { DividerModule } from 'primeng/divider';
-import { CheckboxModule } from 'primeng/checkbox';
-import { ProgressBarModule } from 'primeng/progressbar';
 
 import { AuthService } from '../services/auth.service';
 import {
@@ -25,8 +18,7 @@ import {
 } from '../../../core/services/error-handler.service';
 import { LoaderService } from '../../../core/services/loader.service';
 import { ValidationService } from '../../../core/services/validation.service';
-import { CommonLoaderButtonComponent } from '../../../shared/components/common-loader-button/common-loader-button.component';
-import { UserRegisterDto } from '../../../../assets/schemas/auth.schema';
+import { UserRegisterDto, userRegisterSchemaDto } from '../../../../assets/schemas/auth.schema';
 
 @Component({
   selector: 'app-register',
@@ -36,15 +28,6 @@ import { UserRegisterDto } from '../../../../assets/schemas/auth.schema';
     ReactiveFormsModule,
     RouterModule,
     ToastModule,
-    InputTextModule,
-    PasswordModule,
-    DropdownModule,
-    ButtonModule,
-    CardModule,
-    DividerModule,
-    CheckboxModule,
-    ProgressBarModule,
-    CommonLoaderButtonComponent,
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
@@ -113,7 +96,8 @@ export class RegisterComponent implements OnInit {
     this.registerForm.addValidators(this.passwordMatchValidator.bind(this));
   }
 
-  private passwordMatchValidator(form: FormGroup) {
+  private passwordMatchValidator(control: AbstractControl) {
+    const form = control as FormGroup;
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
 
@@ -144,13 +128,13 @@ export class RegisterComponent implements OnInit {
     if (this.registerForm.valid) {
       try {
         const formData = this.registerForm.value;
-        this.validationService.validateData(
+        this.validationService.validate(
           formData,
-          this.authService['userRegisterSchemaDto']
+          userRegisterSchemaDto
         );
         this.fieldErrors = {};
       } catch (error) {
-        this.fieldErrors = this.errorHandler.showValidationError(error);
+        this.fieldErrors = this.errorHandler.showValidationError(error as any);
       }
     }
   }
@@ -215,12 +199,14 @@ export class RegisterComponent implements OnInit {
         };
 
         this.authService.registerUser(registerData).subscribe({
-          next: _response => {
+          next: (response) => {
             this.isSubmitting = false;
+            console.log('Registration successful:', response);
+
             this.messageService.add({
               severity: 'success',
-              summary: 'Registration Successful',
-              detail: 'Account created successfully! Please login to continue.',
+              summary: 'Registration Successful!',
+              detail: 'Your account has been created successfully. Please sign in to continue.',
               life: 5000,
             });
 
@@ -229,22 +215,66 @@ export class RegisterComponent implements OnInit {
               this.router.navigate(['/auth/login']);
             }, 2000);
           },
-          error: error => {
+          error: (error) => {
             this.isSubmitting = false;
-            this.errorHandler.handleError(error);
+            console.error('Registration failed:', error);
+
+            // Handle different types of errors
+            if (error.error?.message) {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Registration Failed',
+                detail: error.error.message,
+                life: 5000,
+              });
+            } else if (error.error?.data?.message) {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Registration Failed',
+                detail: error.error.data.message,
+                life: 5000,
+              });
+            } else if (error.status === 409) {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Email Already Exists',
+                detail: 'An account with this email address already exists. Please use a different email or try signing in.',
+                life: 5000,
+              });
+            } else if (error.status === 400) {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Invalid Data',
+                detail: 'Please check your information and try again.',
+                life: 5000,
+              });
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Registration Failed',
+                detail: 'Something went wrong. Please try again later.',
+                life: 5000,
+              });
+            }
           },
         });
       } catch (error) {
         this.isSubmitting = false;
-        this.fieldErrors = this.errorHandler.showValidationError(error);
+        this.fieldErrors = this.errorHandler.showValidationError(error as any);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Validation Error',
+          detail: 'Please fix the errors in the form before submitting.',
+          life: 5000,
+        });
       }
     } else {
       this.isSubmitting = false;
       this.validateFormWithZod();
       this.messageService.add({
         severity: 'error',
-        summary: 'Validation Error',
-        detail: 'Please fix the errors in the form before submitting.',
+        summary: 'Form Validation Error',
+        detail: 'Please fill in all required fields correctly.',
         life: 5000,
       });
     }
@@ -256,5 +286,26 @@ export class RegisterComponent implements OnInit {
 
   trackByError(index: number, error: any): any {
     return error;
+  }
+
+  // Helper methods to match login component structure
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.registerForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched || this.isSubmitting));
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.registerForm.get(fieldName);
+    if (field && field.errors) {
+      const errors = field.errors;
+      if (errors['required']) return `${fieldName} is required`;
+      if (errors['email']) return 'Please enter a valid email address';
+      if (errors['minlength']) return `${fieldName} must be at least ${errors['minlength'].requiredLength} characters`;
+      if (errors['maxlength']) return `${fieldName} must be no more than ${errors['maxlength'].requiredLength} characters`;
+      if (errors['pattern']) return 'Password must contain uppercase, lowercase, number, and special character';
+      if (errors['passwordMismatch']) return 'Passwords do not match';
+      if (errors['requiredTrue']) return 'You must accept the terms and conditions';
+    }
+    return this.fieldErrors[fieldName] || '';
   }
 }

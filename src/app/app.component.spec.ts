@@ -14,7 +14,7 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it("should have the 'VINAISM_FRONTEND' title", () => {
+  it('should have the \'VINAISM_FRONTEND\' title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app.title).toEqual('VINAISM_FRONTEND');
