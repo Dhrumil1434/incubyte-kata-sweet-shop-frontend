@@ -5,6 +5,7 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { BadgeModule } from 'primeng/badge';
 import { DividerModule } from 'primeng/divider';
+import { TagModule } from 'primeng/tag';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 
@@ -20,6 +21,7 @@ import { AuthService as CoreAuthService } from '../../../../core/services/auth.s
     ButtonModule,
     BadgeModule,
     DividerModule,
+    TagModule,
     ToastModule,
   ],
   templateUrl: './customer-dashboard.component.html',

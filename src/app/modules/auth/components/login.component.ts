@@ -14,11 +14,15 @@ import {
   userLoginSchemaDto,
 } from '../../../../assets/schemas/auth.schema';
 import { ValidationService } from '../../../core/services/validation.service';
-import { ErrorHandlerService, FormFieldErrors } from '../../../core/services/error-handler.service';
+import {
+  ErrorHandlerService,
+  FormFieldErrors,
+} from '../../../core/services/error-handler.service';
 import { LoaderService } from '../../../core/services/loader.service';
 import { AuthService } from '../services/auth.service';
 import { AuthService as CoreAuthService } from '../../../core/services/auth.service';
 import { CommonLoaderButtonComponent } from '../../../shared/components/common-loader-button/common-loader-button.component';
+import { ROLES } from '../../../core/constants/role.constants';
 
 @Component({
   selector: 'app-login',
@@ -179,16 +183,26 @@ export class LoginComponent implements OnInit {
         detail: 'Login successful! Welcome to Kata Sweet Shop.',
       });
 
-      // Redirect to dashboard or home page
+      // Redirect based on user role
       setTimeout(() => {
-        this.router.navigate(['/dashboard']);
-      }, 1500);
+        const user = this.coreAuthService.getCurrentUser();
 
+        if (user?.userType === ROLES.ADMIN) {
+          this.router.navigate(['/admin']);
+        } else if (user?.userType === ROLES.CUSTOMER) {
+          this.router.navigate(['/customer']);
+        } else {
+          this.router.navigate(['/auth/login']);
+        }
+      }, 1500);
     } catch (error: any) {
       console.error('Login failed:', error);
       this.loginResult = {
         success: false,
-        message: error?.error?.message || error?.message || 'Login failed. Please check your credentials.',
+        message:
+          error?.error?.message ||
+          error?.message ||
+          'Login failed. Please check your credentials.',
         error: error,
       };
 
@@ -196,7 +210,10 @@ export class LoginComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Login Failed',
-        detail: error?.error?.message || error?.message || 'Please check your credentials and try again.',
+        detail:
+          error?.error?.message ||
+          error?.message ||
+          'Please check your credentials and try again.',
       });
     } finally {
       this.isSubmitting = false;

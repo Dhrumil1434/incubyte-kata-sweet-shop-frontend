@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuard, AdminGuard, CustomerGuard } from './core/guards';
 
 export const routes: Routes = [
   {
@@ -6,20 +7,25 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./modules/auth/auth.module').then(m => m.AuthModule),
   },
-  // TODO: Add sweets and purchases modules when they are created
-  // {
-  //   path: 'sweets',
-  //   loadChildren: () =>
-  //     import('./modules/sweets/sweets.module').then(m => m.SweetsModule),
-  // },
-  // {
-  //   path: 'purchases',
-  //   loadChildren: () =>
-  //     import('./modules/purchases/purchases.module').then(m => m.PurchasesModule),
-  // },
+  {
+    path: 'admin',
+    loadChildren: () =>
+      import('./modules/admin/admin.module').then(m => m.AdminModule),
+    canActivate: [AuthGuard, AdminGuard],
+  },
+  {
+    path: 'customer',
+    loadChildren: () =>
+      import('./modules/customer/customer.module').then(m => m.CustomerModule),
+    canActivate: [AuthGuard, CustomerGuard],
+  },
   {
     path: '',
     redirectTo: '/auth/login',
     pathMatch: 'full',
+  },
+  {
+    path: '**',
+    redirectTo: '/auth/login',
   },
 ];
