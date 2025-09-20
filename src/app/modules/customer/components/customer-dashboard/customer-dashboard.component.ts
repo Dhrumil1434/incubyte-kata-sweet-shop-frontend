@@ -110,7 +110,7 @@ export class CustomerDashboardComponent implements OnInit, OnDestroy {
       .getSweets(query)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: _response => {
+        next: response => {
           console.log('Frontend received response:', response);
           console.log('Sweets data:', response.data);
           console.log('Pagination:', response.pagination);
